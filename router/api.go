@@ -24,6 +24,10 @@ func StartServer() *gin.Engine {
 	commentService := service.NewCommentService(commentRepository)
 	commentController := controllers.NewCommentController(commentService)
 
+	socialMediaRepository := repository.NewSocialMediaRepository()
+	socialMediaService := service.NewSocialMediaService(socialMediaRepository)
+	socialMediaController := controllers.NewSocialMediaController(socialMediaService)
+
 	userRouter := router.Group("/users")
 	{
 		// userRouter.Use(middleware.Authentication())
@@ -45,6 +49,13 @@ func StartServer() *gin.Engine {
 		commentRouter.Use(middleware.Authentication())
 		commentRouter.POST("/create", commentController.CreateComment)
 		commentRouter.DELETE("/delete/:id", commentController.DeleteComment)
+	}
+
+	socialMediaRouter := router.Group("/socialMedias")
+	{
+		socialMediaRouter.Use(middleware.Authentication())
+		socialMediaRouter.POST("/create", socialMediaController.CreateSocialMedia)
+		socialMediaRouter.DELETE("/delete/:id", socialMediaController.DeleteSocialMedia)
 	}
 
 	return router
