@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
@@ -39,10 +40,10 @@ func VerifyToken(c *gin.Context) (interface{}, error) {
 		}
 		return []byte(secretKey), nil
 	})
-
+	fmt.Println(token)
 	if _, ok := token.Claims.(jwt.MapClaims); !ok && !token.Valid {
 		return nil, errReponse
 	}
-
+	fmt.Println(token.Claims.(jwt.MapClaims))
 	return token.Claims.(jwt.MapClaims), nil
 }

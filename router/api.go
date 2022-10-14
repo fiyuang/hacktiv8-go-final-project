@@ -2,6 +2,7 @@ package router
 
 import (
 	"hacktiv8-go-final-project/controllers"
+	"hacktiv8-go-final-project/middleware"
 	"hacktiv8-go-final-project/repository"
 	"hacktiv8-go-final-project/service"
 
@@ -15,11 +16,35 @@ func StartServer() *gin.Engine {
 	userService := service.NewUserService(userRepository)
 	userController := controllers.NewUserController(userService)
 
+	photoRepository := repository.NewPhotoRepository()
+	photoService := service.NewPhotoService(photoRepository)
+	photoController := controllers.NewPhotoController(photoService)
+
+	commentRepository := repository.NewCommentRepository()
+	commentService := service.NewCommentService(commentRepository)
+	commentController := controllers.NewCommentController(commentService)
+
 	userRouter := router.Group("/users")
 	{
 		// userRouter.Use(middleware.Authentication())
 		userRouter.POST("/register", userController.UserRegister)
 		userRouter.POST("/login", userController.UserLogin)
+
+		userRouter.Use(middleware.Authentication())
+	}
+
+	photoRouter := router.Group("/photos")
+	{
+		photoRouter.Use(middleware.Authentication())
+		photoRouter.POST("/create", photoController.CreatePhoto)
+		photoRouter.DELETE("/delete/:id", photoController.DeletePhoto)
+	}
+
+	commentRouter := router.Group("/comments")
+	{
+		commentRouter.Use(middleware.Authentication())
+		commentRouter.POST("/create", commentController.CreateComment)
+		commentRouter.DELETE("/delete/:id", commentController.DeleteComment)
 	}
 
 	return router

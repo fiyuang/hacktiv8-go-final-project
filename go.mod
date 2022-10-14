@@ -4,6 +4,8 @@ go 1.17
 
 require gorm.io/driver/postgres v1.4.4
 
+require github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+
 require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect

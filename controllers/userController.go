@@ -33,13 +33,12 @@ func NewUserController(newUserService service.UserService) UserController {
 }
 
 func (controller *userControllerImpl) GetUserById(c *gin.Context) {
-	id := c.Param("id")
-	idint, err := strconv.Atoi(id)
+	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Parameter False"})
 		return
 	}
-	res, err := controller.UserService.GetUserById(idint)
+	res, err := controller.UserService.GetUserById(id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
 		return
@@ -62,7 +61,10 @@ func (controller *userControllerImpl) UserRegister(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": res})
+	c.JSON(http.StatusOK, gin.H{
+		"status": 201,
+		"data":   res,
+	})
 }
 
 func (controller *userControllerImpl) UserLogin(c *gin.Context) {
