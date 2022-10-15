@@ -9,6 +9,8 @@ type UserService interface {
 	GetUserById(id int) (*models.User, error)
 	UserRegister(userReq *models.User) (*models.User, error)
 	UserLogin(userReq *models.User) (*models.User, error)
+	UpdateUser(userReq *models.User, userId int) (*models.User, error)
+	DeleteUser(id uint) (*models.User, error)
 }
 
 type userServiceImpl struct {
@@ -45,6 +47,24 @@ func (service *userServiceImpl) UserRegister(userReq *models.User) (*models.User
 func (service *userServiceImpl) UserLogin(userReq *models.User) (*models.User, error) {
 	user, err := service.UserRepository.UserLogin(userReq)
 	// fmt.Println(err)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, err
+}
+
+func (service *userServiceImpl) UpdateUser(userReq *models.User, userId int) (*models.User, error) {
+	user, err := service.UserRepository.UpdateUser(userReq, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, err
+}
+
+func (service *userServiceImpl) DeleteUser(id uint) (*models.User, error) {
+	user, err := service.UserRepository.DeleteUser(id)
 	if err != nil {
 		return nil, err
 	}

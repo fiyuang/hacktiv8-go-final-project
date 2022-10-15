@@ -18,6 +18,14 @@ type User struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+type UserUpdate struct {
+	Id        uint      `json:"id"`
+	Username  string    `json:"username"`
+	Email     string    `json:"email"`
+	Age       int32     `json:"age"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 	_, errCreate := govalidator.ValidateStruct(u)
 
