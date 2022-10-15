@@ -6,8 +6,10 @@ import (
 )
 
 type CommentService interface {
+	GetAllComments(comments *[]models.Comment) (*[]models.Comment, error)
 	CreateComment(commentReq *models.Comment) (*models.Comment, error)
 	DeleteComment(id uint) (*models.Comment, error)
+	UpdateComment(commentReq *models.Comment, commentId int) (*models.Comment, error)
 }
 
 type commentServiceImpl struct {
@@ -18,6 +20,15 @@ func NewCommentService(newCommentRepository repository.CommentRepository) Commen
 	return &commentServiceImpl{
 		CommentRepository: newCommentRepository,
 	}
+}
+
+func (service *commentServiceImpl) GetAllComments(comments *[]models.Comment) (*[]models.Comment, error) {
+	photo, err := service.CommentRepository.GetAllComments(comments)
+	if err != nil {
+		return nil, err
+	}
+
+	return photo, err
 }
 
 func (service *commentServiceImpl) CreateComment(commentReq *models.Comment) (*models.Comment, error) {
@@ -38,4 +49,13 @@ func (service *commentServiceImpl) DeleteComment(id uint) (*models.Comment, erro
 	}
 
 	return comment, err
+}
+
+func (service *commentServiceImpl) UpdateComment(commentReq *models.Comment, photoId int) (*models.Comment, error) {
+	photo, err := service.CommentRepository.UpdateComment(commentReq, photoId)
+	if err != nil {
+		return nil, err
+	}
+
+	return photo, err
 }

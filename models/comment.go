@@ -12,3 +12,11 @@ type Comment struct {
 	User      *User     `json:"user" gorm:"ForeignKey:UserId"`
 	Photo     *Photo    `json:"photo" gorm:"ForeignKey:PhotoId"`
 }
+
+type CommentUpdate struct {
+	Id        uint      `json:"id"`
+	UserId    uint      `json:"user_id"`
+	PhotoId   uint      `json:"photo_id"`
+	Message   string    `json:"message"`
+	UpdatedAt time.Time `json:"updated_at"`
+}

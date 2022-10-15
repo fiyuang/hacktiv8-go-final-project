@@ -50,8 +50,10 @@ func StartServer() *gin.Engine {
 	commentRouter := router.Group("/comments")
 	{
 		commentRouter.Use(middleware.Authentication())
-		commentRouter.POST("/create", commentController.CreateComment)
-		commentRouter.DELETE("/delete/:id", commentController.DeleteComment)
+		commentRouter.GET("/", commentController.GetAllComments)
+		commentRouter.POST("/", commentController.CreateComment)
+		commentRouter.DELETE("/:commentId", commentController.DeleteComment)
+		commentRouter.PUT("/:commentId", commentController.UpdateComment)
 	}
 
 	socialMediaRouter := router.Group("/socialMedias")
