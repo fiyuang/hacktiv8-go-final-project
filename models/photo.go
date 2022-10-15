@@ -18,6 +18,15 @@ type Photo struct {
 	User      *User     `json:"user" gorm:"ForeignKey:UserId"`
 }
 
+type PhotoUpdate struct {
+	Id        uint      `json:"id"`
+	Title     string    `json:"title"`
+	Caption   string    `json:"caption"`
+	PhotoUrl  string    `json:"photo_url"`
+	UserId    uint      `json:"user_id"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
 func (photo *Photo) BeforeCreate(tx *gorm.DB) (err error) {
 	_, errCreate := govalidator.ValidateStruct(photo)
 
