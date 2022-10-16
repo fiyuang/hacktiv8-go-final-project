@@ -145,5 +145,57 @@ func CommentAuthorization() gin.HandlerFunc {
 		}
 		c.Next()
 	}
+}
+
+func SocialMediaAuthorization() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		db := database.GetDB()
+
+		// Data User Define
+		userData := c.MustGet("userData").(jwt.MapClaims)
+		userID := uint(userData["id"].(float64))
+
+		User := models.User{}
+		err := db.First(&User, "id = ?", userID).Error
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+				"error":   "User Not Found",
+				"message": "Data doesn't exist",
+			})
+			return
+		}
+
+		if c.Request.Method != "POST" {
+			socialMediaId, err := strconv.Atoi(c.Param("socialMediaId"))
+			if err != nil {
+				c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+					"error":   "Bad Request",
+					"message": "Invalid parameter",
+				})
+				return
+			}
+
+			// Data SocialMedia Define
+			SocialMedia := models.SocialMedia{}
+			err = db.Select("user_id").First(&SocialMedia, uint(socialMediaId)).Error
+			if err != nil {
+				c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+					"error":   "Data Not Found",
+					"message": "Data doesn't exist",
+				})
+				return
+			}
+
+			if SocialMedia.UserId != User.Id {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+					"error":   "Unauthorized",
+					"message": "You are not allowed to access this data",
+				})
+				return
+			}
+
+		}
+		c.Next()
+	}
 
 }

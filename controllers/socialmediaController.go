@@ -129,7 +129,7 @@ func (controller *socialMediaControllerImpl) CreateSocialMedia(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"status": 201,
+		"status": http.StatusCreated,
 		"data":   res,
 	})
 }
