@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var secretKey = "rahasia"
+var secretKey = "your-256-bit-secret"
 
 func GenerateToken(id uint, email string) string {
 	claims := jwt.MapClaims{

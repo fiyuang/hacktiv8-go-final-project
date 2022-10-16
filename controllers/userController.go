@@ -103,7 +103,7 @@ func (controller *userControllerImpl) UserLogin(c *gin.Context) {
 		return
 	}
 
-	token := helpers.GenerateToken(uint(User.Id), User.Email)
+	token := helpers.GenerateToken(uint(getUser.Id), User.Email)
 
 	c.JSON(http.StatusOK, gin.H{
 		"token": token,
