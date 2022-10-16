@@ -16,16 +16,14 @@ func UserAuthorization() gin.HandlerFunc {
 		db := database.GetDB()
 		userData := c.MustGet("userData").(jwt.MapClaims)
 		userID := uint(userData["id"].(float64))
-		userEmail := userData["email"].(string)
 
 		User := models.User{}
-
 		if c.Request.Method != "POST" {
-			err := db.First(&User, "email = ?", userEmail).Error
+			err := db.First(&User, "id = ?", userID).Error
 			if err != nil {
 				c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
 					"error":   "Data Not Found",
-					"message": "data doesn't exist",
+					"message": "Data doesn't exist",
 				})
 				return
 			}
@@ -34,7 +32,7 @@ func UserAuthorization() gin.HandlerFunc {
 			if uint(User.Id) != userID {
 				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 					"error":   "Unauthorized",
-					"message": "you are not allowed to access this data",
+					"message": "You are not allowed to access this data",
 				})
 				return
 			}
