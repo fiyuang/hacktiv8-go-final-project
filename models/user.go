@@ -1,6 +1,8 @@
 package models
 
 import (
+	"errors"
+	"fmt"
 	"hacktiv8-go-final-project/helpers"
 	"time"
 
@@ -31,6 +33,12 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 
 	if errCreate != nil {
 		err = errCreate
+		return
+	}
+
+	if u.Age <= 8 {
+		err = errors.New("minimum age is 8 years old")
+		fmt.Println(err)
 		return
 	}
 
