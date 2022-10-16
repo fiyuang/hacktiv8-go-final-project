@@ -6,9 +6,9 @@ import (
 )
 
 type SocialMediaService interface {
-	// GetAllSocialMedias(*[]models.SocialMedia) (*[]models.SocialMedia, error)
+	GetAllSocialMedias(*[]models.SocialMedia) (*[]models.SocialMedia, error)
 	CreateSocialMedia(socialMediaReq *models.SocialMedia) (*models.SocialMedia, error)
-	// UpdateSocialMedia(socialMediaReq *models.SocialMedia) (*models.SocialMedia, error)
+	UpdateSocialMedia(socialMediaReq *models.SocialMedia, socialmediaId int) (*models.SocialMedia, error)
 	DeleteSocialMedia(id uint) (*models.SocialMedia, error)
 }
 
@@ -20,6 +20,24 @@ func NewSocialMediaService(newSocialMediaRepository repository.SocialMediaReposi
 	return &socialMediaServiceImpl{
 		SocialMediaRepository: newSocialMediaRepository,
 	}
+}
+
+func (service *socialMediaServiceImpl) GetAllSocialMedias(socialmedias *[]models.SocialMedia) (*[]models.SocialMedia, error) {
+	socialMedia, err := service.SocialMediaRepository.GetAllSocialMedias(socialmedias)
+	if err != nil {
+		return nil, err
+	}
+
+	return socialMedia, err
+}
+
+func (service *socialMediaServiceImpl) UpdateSocialMedia(socialMediaReq *models.SocialMedia, socialmediaId int) (*models.SocialMedia, error) {
+	socialMedia, err := service.SocialMediaRepository.UpdateSocialMedia(socialMediaReq, socialmediaId)
+	if err != nil {
+		return nil, err
+	}
+
+	return socialMedia, err
 }
 
 func (service *socialMediaServiceImpl) CreateSocialMedia(socialMediaReq *models.SocialMedia) (*models.SocialMedia, error) {

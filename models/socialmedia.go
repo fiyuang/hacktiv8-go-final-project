@@ -11,3 +11,11 @@ type SocialMedia struct {
 	UpdatedAt      time.Time `json:"updated_at"`
 	User           *User     `json:"user" gorm:"ForeignKey:UserId"`
 }
+
+type SocialMediaUpdate struct {
+	Id             uint      `json:"id"`
+	Name           string    `json:"name"`
+	SocialMediaUrl string    `json:"social_media_url"`
+	UserId         uint      `json:"user_id"`
+	UpdatedAt      time.Time `json:"updated_at"`
+}

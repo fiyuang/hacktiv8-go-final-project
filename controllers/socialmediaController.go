@@ -18,6 +18,8 @@ import (
 type SocialMediaController interface {
 	CreateSocialMedia(c *gin.Context)
 	DeleteSocialMedia(c *gin.Context)
+	UpdateSocialMedia(c *gin.Context)
+	GetAllSocialMedias(c *gin.Context)
 }
 
 type socialMediaControllerImpl struct {
@@ -28,6 +30,66 @@ func NewSocialMediaController(newSocialMediaService service.SocialMediaService) 
 	return &socialMediaControllerImpl{
 		SocialMediaService: newSocialMediaService,
 	}
+}
+
+func (controller *socialMediaControllerImpl) GetAllSocialMedias(c *gin.Context) {
+	var photos []models.SocialMedia
+	res, err := controller.SocialMediaService.GetAllSocialMedias(&photos)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"data": res})
+}
+
+func (controller *socialMediaControllerImpl) UpdateSocialMedia(c *gin.Context) {
+	db := database.GetDB()
+
+	socialMediaId, err := strconv.Atoi(c.Param("socialMediaId"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Parameter False"})
+		return
+	}
+
+	userData := c.MustGet("userData").(jwt.MapClaims)
+	userEmail := userData["email"].(string)
+
+	contentType := helpers.GetContentType(c)
+	_, _, _ = db, contentType, userEmail
+
+	// Photo := models.Photo{}
+	// error := db.First(&Photo, "email = ?", userEmail).Error
+	// if error != nil {
+	// 	if errors.Is(err, gorm.ErrRecordNotFound) {
+	// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Photo not found!"})
+	// 		return
+	// 	}
+	// 	return
+	// }
+
+	var input models.SocialMedia
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	res, err := controller.SocialMediaService.UpdateSocialMedia(&input, socialMediaId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
+		return
+	}
+
+	socialmediaUpdate := models.SocialMediaUpdate{}
+	socialmediaUpdate.Id = res.Id
+	socialmediaUpdate.Name = res.Name
+	socialmediaUpdate.SocialMediaUrl = res.SocialMediaUrl
+	socialmediaUpdate.UserId = res.UserId
+	socialmediaUpdate.UpdatedAt = res.UpdatedAt
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": http.StatusOK,
+		"data":   socialmediaUpdate,
+	})
 }
 
 func (controller *socialMediaControllerImpl) CreateSocialMedia(c *gin.Context) {
@@ -73,7 +135,7 @@ func (controller *socialMediaControllerImpl) CreateSocialMedia(c *gin.Context) {
 }
 
 func (controller *socialMediaControllerImpl) DeleteSocialMedia(c *gin.Context) {
-	socialMediaId, err := strconv.Atoi(c.Param("id"))
+	socialMediaId, err := strconv.Atoi(c.Param("socialMediaId"))
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Parameter False"})
