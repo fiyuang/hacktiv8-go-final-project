@@ -1,9 +1,9 @@
 package middleware
 
 import (
-	"fmt"
 	"hacktiv8-go-final-project/database"
 	"hacktiv8-go-final-project/models"
+	"strconv"
 
 	"net/http"
 
@@ -16,15 +16,12 @@ func UserAuthorization() gin.HandlerFunc {
 		db := database.GetDB()
 		userData := c.MustGet("userData").(jwt.MapClaims)
 		userID := uint(userData["id"].(float64))
+		userEmail := userData["email"].(string)
+
 		User := models.User{}
-		getUser := db.First(&User, "id = ?", userID).Error
 
-		fmt.Println(getUser)
-
-		fmt.Println(userID)
 		if c.Request.Method != "POST" {
-			User := models.User{}
-			err := db.First(&User, "id = ?", uint(userID)).Error
+			err := db.First(&User, "email = ?", userEmail).Error
 			if err != nil {
 				c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
 					"error":   "Data Not Found",
@@ -45,4 +42,108 @@ func UserAuthorization() gin.HandlerFunc {
 
 		c.Next()
 	}
+}
+
+func PhotoAuthorization() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		db := database.GetDB()
+
+		// Data User Define
+		userData := c.MustGet("userData").(jwt.MapClaims)
+		userID := uint(userData["id"].(float64))
+		User := models.User{}
+		err := db.First(&User, "id = ?", userID).Error
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+				"error":   "User Not Found",
+				"message": "data doesn't exist",
+			})
+			return
+		}
+
+		if c.Request.Method != "POST" {
+			photoId, err := strconv.Atoi(c.Param("photoId"))
+			if err != nil {
+				c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+					"error":   "Bad Request",
+					"message": "invalid parameter",
+				})
+				return
+			}
+
+			// Data Photos Define
+			Photos := models.Photo{}
+			err = db.Select("user_id").First(&Photos, uint(photoId)).Error
+			if err != nil {
+				c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+					"error":   "Data Not Found",
+					"message": "Data doesn't exist",
+				})
+				return
+			}
+
+			if Photos.UserId != User.Id {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+					"error":   "Unauthorized",
+					"message": "You are not allowed to access this data",
+				})
+				return
+			}
+
+		}
+		c.Next()
+	}
+}
+
+func CommentAuthorization() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		db := database.GetDB()
+
+		// Data User Define
+		userData := c.MustGet("userData").(jwt.MapClaims)
+		userID := uint(userData["id"].(float64))
+
+		User := models.User{}
+		err := db.First(&User, "id = ?", userID).Error
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+				"error":   "User Not Found",
+				"message": "Data doesn't exist",
+			})
+			return
+		}
+
+		if c.Request.Method != "POST" {
+			commentId, err := strconv.Atoi(c.Param("commentId"))
+			if err != nil {
+				c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+					"error":   "Bad Request",
+					"message": "Invalid parameter",
+				})
+				return
+			}
+
+			// Data Comment Define
+			Comment := models.Comment{}
+			err = db.Select("user_id").First(&Comment, uint(commentId)).Error
+			if err != nil {
+				c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+					"error":   "Data Not Found",
+					"message": "Data doesn't exist",
+				})
+				return
+			}
+
+			if Comment.UserId != User.Id {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+					"error":   "Unauthorized",
+					"message": "You are not allowed to access this data",
+				})
+				return
+			}
+
+		}
+		c.Next()
+	}
+
 }
